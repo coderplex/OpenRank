@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 const User = require('../models').User;
+const Role = require('../models').Role;
+const UserRole = require('../models').UserRole;
 
 module.exports = {
     create(req, res) {
@@ -38,5 +40,43 @@ module.exports = {
                 }
             })
             .catch(error => res.status(400).json({ data: error, message: 'No such user found' }));
-    }
-};
+    },
+
+    addUserRole(req,res){
+        const { value } = req.body;
+        const id = req.params.id;
+        return User
+        .findOne({ where: { id } })
+        .then(user => {
+            Role
+            .findOne({ where: { value } })
+            .then(role => {
+                  UserRole.create({
+                    UserId:id,
+                    RoleId:role.id,
+                  });
+                  res.status(200).json({message:'Role added to user' });
+            } )
+        } )
+        .catch(error => res.status(400).json({ data: error, message: 'No such user found' }));
+    },
+
+    removeUserRole(req,res){
+        const { value } = req.body;
+        const id = req.params.id;
+        return User
+        .findOne({ where: { id } })
+        .then(user => {
+            Role
+            .findOne({ where: { value } })
+            .then(role => {
+                  UserRole.removeUserRole({
+                    UserId:id,
+                    RoleId:role.id,
+                  });
+                  res.status(200).json({message:'Role removed from user' });
+            } )
+        } )
+        .catch(error => res.status(400).json({ data: error, message: 'No such user found' }));
+    },
+}
