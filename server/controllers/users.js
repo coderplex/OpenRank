@@ -70,9 +70,9 @@ module.exports = {
             Role
             .findOne({ where: { value } })
             .then(role => {
-                  UserRole.removeUserRole({
-                    UserId:id,
-                    RoleId:role.id,
+                  UserRole.destroy ({ where: { UserId:id,
+                        RoleId:role.id }
+                    
                   });
                   res.status(200).json({message:'Role removed from user' });
             } )
