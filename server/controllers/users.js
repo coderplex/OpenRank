@@ -46,37 +46,41 @@ module.exports = {
         const { value } = req.body;
         const id = req.params.id;
         return User
-        .findOne({ where: { id } })
-        .then(user => {
-            Role
-            .findOne({ where: { value } })
-            .then(role => {
-                  UserRole.create({
-                    UserId:id,
-                    RoleId:role.id,
-                  });
-                  res.status(200).json({message:'Role added to user' });
+            .findOne({ where: { id } })
+            .then(user => {
+                const id = user.id;
+                Role
+                    .findOne({ where: { value } })
+                    .then(role => {
+                         UserRole.create({
+                            UserId : id,
+                            RoleId : role.id,
+                        });
+                        res.status(200).json({message:'Role \'' + value +'\' added to user' });
+                    } )
+                    .catch(error => res.status(400).json({ data: error, message: 'No such role found' }))
             } )
-        } )
-        .catch(error => res.status(400).json({ data: error, message: 'No such user found' }));
+            .catch(error => res.status(400).json({ data: error, message: 'No such user found' }));
     },
 
     removeUserRole(req,res){
         const { value } = req.body;
         const id = req.params.id;
         return User
-        .findOne({ where: { id } })
-        .then(user => {
-            Role
-            .findOne({ where: { value } })
-            .then(role => {
-                  UserRole.destroy ({ where: { UserId:id,
-                        RoleId:role.id }
-                    
-                  });
-                  res.status(200).json({message:'Role removed from user' });
+            .findOne({ where: { id } })
+            .then(user => {
+                Role
+                    .findOne({ where: { value } })
+                    .then(role => {
+                        const id = user.id;
+                        UserRole
+                            .destroy({ where: { UserId:id, RoleId:role.id } 
+                            })
+                            .then(userrole => {res.status(200).json({message:'Role \'' + value +'\' removed from user' })})
+                            .catch(error => res.status(400).json({ data: error, message: 'No such role assigned to user' }));
+                    } )
+                    .catch(error => res.status(400).json({ data: error, message: 'No such role found' }))
             } )
-        } )
         .catch(error => res.status(400).json({ data: error, message: 'No such user found' }));
     },
 }
